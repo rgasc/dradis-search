@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-const port = "1337"
-
 var config Config
 
 func main() {
