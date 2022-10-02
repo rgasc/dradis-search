@@ -6,7 +6,7 @@ Download a prebuilt binary from the [releases](https://github.com/rgasc/dradis-s
 
 Or, clone this repository:
 ```shell
-https://github.com/rgasc/dradis-search.git
+git clone https://github.com/rgasc/dradis-search.git
 ```
 
 And compile it:
