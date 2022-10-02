@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -49,8 +50,10 @@ func main() {
 		}
 
 		for _, issue := range issues {
-			if issue.Title == *term { // TODO improve the search method
-				results = append(results, fmt.Sprintf(config.BaseUrl, fmt.Sprintf("projects/%d/issues/%d", project.Id, issue.Id)))
+			if strings.Contains(strings.ToLower(issue.Title), strings.ToLower(*term)) {
+				results = append(results, fmt.Sprintf(
+					config.BaseUrl, fmt.Sprintf("projects/%d/issues/%d (%s)", project.Id, issue.Id, issue.Title),
+				))
 			}
 		}
 	}
