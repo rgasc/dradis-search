@@ -48,7 +48,7 @@ func main() {
 		}
 
 		for _, issue := range issues {
-			if strings.Contains(strings.ToLower(issue.Title), strings.ToLower(*term)) {
+			if strings.Contains(strings.ToLower(issue.Text), strings.ToLower(*term)) {
 				results = append(results, fmt.Sprintf(
 					config.BaseUrl, fmt.Sprintf("projects/%d/issues/%d (%s)", project.Id, issue.Id, issue.Title),
 				))
@@ -91,6 +91,7 @@ func getProjects() (projects []Project, err error) {
 		return
 	}
 
+	req.Header.Set("Accept", "application/vnd.dradisapi; v=2")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=\"%s\"", config.ApiKey))
 
@@ -108,6 +109,7 @@ func getIssues(projectID int) (issues []Issue, err error) {
 		return
 	}
 
+	req.Header.Set("Accept", "application/vnd.dradisapi; v=2")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Token token=\"%s\"", config.ApiKey))
 	req.Header.Add("Dradis-Project-Id", strconv.Itoa(projectID))
