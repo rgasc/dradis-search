@@ -8,6 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -77,8 +80,16 @@ func main() {
 	}
 }
 
+func rootDir() string {
+	_, b, _, _ := runtime.Caller(0)
+	d := path.Join(path.Dir(b), "/dradis-search")
+	return filepath.Dir(d)
+}
+
 func loadEnv() (err error) {
-	if err = godotenv.Load(".env"); err == nil {
+	envPath := path.Join(rootDir(), ".env")
+
+	if err = godotenv.Load(envPath); err == nil {
 		return
 	}
 
@@ -102,9 +113,9 @@ func loadEnv() (err error) {
 		return
 	}
 
-	defer godotenv.Load(".env")
+	defer godotenv.Load(envPath)
 
-	return godotenv.Write(env, ".env")
+	return godotenv.Write(env, envPath)
 }
 
 func getResponseBody(r *http.Request) (body []byte, err error) {
