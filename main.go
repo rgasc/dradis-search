@@ -2,34 +2,44 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 var config Config
 
 func main() {
-	baseUrl := flag.String("baseurl", "", "Dradis base API URL")
-	apiKey := flag.String("apikey", "", "Dradis API key")
-	term := flag.String("term", "", "Search term")
-
+	query := flag.String("q", "", "Search query")
 	flag.Parse()
 
-	if *baseUrl == "" || *apiKey == "" || *term == "" {
-		log.Fatal(errors.New("missing required flags"))
+	if *query == "" {
+		log.Fatal("ERROR: missing search query (-q)")
+	}
+
+	if err := loadEnv(); err != nil {
+		log.Fatalf("ERROR: %s", err)
+	}
+
+	for _, v := range []string{"BASE_URL", "API_KEY"} {
+		val, ok := os.LookupEnv(v)
+		if !ok || val == "" {
+			log.Fatal("ERROR: Missing required variables in .env file")
+		}
 	}
 
 	config = Config{
-		BaseUrl: *baseUrl + "/%s",
-		ApiKey:  *apiKey,
-		Term:    *term,
+		BaseUrl: os.Getenv("BASE_URL") + "/%s",
+		ApiKey:  os.Getenv("API_KEY"),
+		Query:   *query,
 	}
 
 	log.Println("Getting projects from Dradis...")
@@ -40,7 +50,7 @@ func main() {
 
 	var results []string
 
-	log.Printf("Getting issues and searching for term \"%s\"...", *term)
+	log.Printf("Getting issues and searching for term \"%s\"...", config.Query)
 	for _, project := range projects {
 		issues, err := getIssues(project.Id)
 		if err != nil {
@@ -48,7 +58,7 @@ func main() {
 		}
 
 		for _, issue := range issues {
-			if strings.Contains(strings.ToLower(issue.Text), strings.ToLower(*term)) {
+			if strings.Contains(strings.ToLower(issue.Text), strings.ToLower(config.Query)) {
 				results = append(results, fmt.Sprintf(
 					config.BaseUrl, fmt.Sprintf("projects/%d/issues/%d (%s)", project.Id, issue.Id, issue.Title),
 				))
@@ -65,6 +75,36 @@ func main() {
 	for i, result := range results {
 		fmt.Printf("%d: %s\n", i+1, result)
 	}
+}
+
+func loadEnv() (err error) {
+	if err = godotenv.Load(".env"); err == nil {
+		return
+	}
+
+	log.Println("Doing a first time setup and storing the variables to .env")
+
+	var baseUrl string
+	var apiKey string
+
+	fmt.Println("Specify the Dradis base URL (https://example.com/pro):")
+	if _, err = fmt.Scan(&baseUrl); err != nil {
+		return
+	}
+
+	fmt.Println("Specify the API key (profile -> API Token):")
+	if _, err = fmt.Scan(&apiKey); err != nil {
+		return
+	}
+
+	env, err := godotenv.Unmarshal(fmt.Sprintf("BASE_URL=%s\nAPI_KEY=%s", baseUrl, apiKey))
+	if err != nil {
+		return
+	}
+
+	defer godotenv.Load(".env")
+
+	return godotenv.Write(env, ".env")
 }
 
 func getResponseBody(r *http.Request) (body []byte, err error) {

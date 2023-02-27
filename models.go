@@ -7,7 +7,7 @@ import (
 type Config struct {
 	BaseUrl string
 	ApiKey  string
-	Term    string
+	Query   string
 }
 
 type Project struct {

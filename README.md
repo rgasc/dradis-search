@@ -17,5 +17,7 @@ go build -o dradis-search *.go
 ## Usage
 Run the binary as follows:
 ```shell
-./dradis-search -baseurl="https://YOUR_BASE_URL/pro" -apikey="YOUR_API_KEY" -term="SEARCH TERM"
+./dradis-search -q "SEARCH QUERY"
 ```
+
+On first time execution, the program will ask for your Dradis base URL and API key. This will be stored in a `.env` variable in the root directory.
