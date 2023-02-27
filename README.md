@@ -11,7 +11,7 @@ git clone https://github.com/rgasc/dradis-search.git
 
 And compile it:
 ```shell
-go build -o dradis-search *.go
+go build -o dradis-search
 ```
 
 ## Usage
