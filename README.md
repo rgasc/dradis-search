@@ -1,5 +1,5 @@
 # Dradis search
-This is a small program written in Go to search for issues in Dradis by their title. It returns a list of links to the issues that are found, along with their title.
+This is a small program written in Go to search for issues in Dradis by their title and content. It returns a list of links to the issues that are found, along with their title.
 
 ## Installation
 Download a prebuilt binary from the [releases](https://github.com/rgasc/dradis-search/releases) page and run it as shown in the [usage](#Usage) section.
